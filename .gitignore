@@ -1,0 +1,6 @@
+.DS_Store
+app/.DS_Store
+app/__pycache__/main.cpython-38.pyc
+app/__pycache__/main.cpython-39.pyc
+targetify/.DS_Store
+.ipynb_checkpoints/
