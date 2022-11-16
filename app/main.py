@@ -15,5 +15,3 @@ def get_incomes():
 def add_income():
     incomes.append(request.get_json())
     return 'here is my text', 200
-
-@app.route('/ab_testing', method = ['POST'])
