@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request
 import os
-import data_manipulation
 
 app = Flask(__name__, static_url_path='/static/')
 
