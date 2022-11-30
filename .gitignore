@@ -4,3 +4,6 @@ app/__pycache__/main.cpython-38.pyc
 app/__pycache__/main.cpython-39.pyc
 targetify/.DS_Store
 .ipynb_checkpoints/
+__pycache__/tools.cpython-38.pyc 
+Models/__pycache__/ChartData.cpython-38.pyc
+Models/__pycache__/DataPoint.cpython-38.pyc

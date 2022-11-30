@@ -11,6 +11,3 @@ class DataPoint:
         self.y = y
         self.label = label
         self.group = group
-        
-    def __repr__(self):
-        return str(self.__dict__)

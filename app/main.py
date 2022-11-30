@@ -2,6 +2,7 @@ from flask import Flask, jsonify, request
 import os
 from tools import DataManipulation
 import pandas as pd
+import json
 
 app = Flask(__name__, static_url_path='/static/')
 
@@ -26,21 +27,26 @@ def get_page():
     page = f"{root_dir}/static/{page_name}"
     return open(page, "r")
 
-@app.route("/chart_data")
+@app.route("/chart_data", methods = ["POST"])
 def get_chart_data():
 
-    df = pd.read_csv("static/pagelite_login.csv")
-    freq = "1M"
-    column = "clicks"
-    chart_type = "line"
+    print("Accepted", request)
+    data = json.loads(request.stream.read(), strict=False)
+    print(data)
+
+    page_name = data["page"]
+    chart_type = data["chart_type"]
+    freq = data["freq"]
+    column = data["column"]
 
     chart_data = dm.create_chart(
-        df = df,
+        page = page_name,
         freq = freq,
-        column = column, 
-        chart_type = chart_type,
+        column = column,
         group = None)
-    return_json = chart_data.to_json()
+        
+    return_json = json.dumps(chart_data, default = lambda x: x.__dict__)
+
     return return_json, 200
 
 def  _root_directory():
