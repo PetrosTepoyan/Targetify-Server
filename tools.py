@@ -6,6 +6,7 @@ import calendar
 # Our models
 from Models.DataPoint import DataPoint
 from Models.ChartData import ChartData
+from Models.PageVersion import PageVersion
 
 import warnings
 warnings.filterwarnings("ignore")
@@ -162,7 +163,7 @@ class DataManipulation:
 
         return data_points
     
-    def create_chart(self, page, freq, column, group=None):
+    def create_chart(self, page, freq, column, groups = None):
         """
         A function used to create a ChartData object from a given dataframe
         
@@ -179,24 +180,42 @@ class DataManipulation:
         A ChartData object
         """
         
-        df = pd.read_csv(f"static/{page}")
+        df = pd.read_csv(f"static/pages/{page}")
         freq = freq
         column = column
-        group = group
-        
-        data_points = self.create_data_points(df, freq, column, group)
-        
-        chart = ChartData(
-            page = page,
-            y_name = column,
-            x_name = "date",
-            data_points = data_points
-        )
-        
-        return chart
 
-    def get_page_info(self):
-        df = pd.read_csv("static/pages_info.csv")
-        df_version_code = df[["page.version", "group.codes"]]
-        pageVersions = [PageVersion(row[1]["page.version"], row[1]["group.codes"]) for row in df_version_code.iterrows()]
+        if groups:
+
+            data_points_list = []
+
+            for group in groups:
+                data_points = self.create_data_points(df, freq, column, group)
+                data_points_list = data_points_list + data_points
+
+            chart = ChartData(
+                page = page,
+                y_name = column,
+                x_name = "date",
+                data_points = data_points_list
+            )
+
+            return chart
+
+        else:
+            data_points = self.create_data_points(df, freq, column, groups)
+            
+            chart = ChartData(
+                page = page,
+                y_name = column,
+                x_name = "date",
+                data_points = data_points
+            )
+            
+            return chart
+
+    def get_pages_info(self):
+        df_info = pd.read_csv("static/pages_info.csv")
+        pageVersions = [PageVersion(row[1]["page_name"], row[1]["code"], row[1]["description"]) for row in df_info.iterrows()]
         return pageVersions
+
+    

@@ -1,31 +1,31 @@
-"","page.version","clicks.mean","lifetime.mean","group.codes"
-"1","main.0",18.8,47.0810585964471,"original"
-"2","main.1",15.6935483870968,37.3705098445185,"title on left & login button is red"
-"3","main.2",37.1875,74.8140090286755,"title on right & login button is red"
-"4","main.3",9.36458333333333,28.84375,"title on left & login button is orange"
-"5","main.4",8.94214876033058,30.5454545454545,"title on right & login button is orange"
-"6","main.5",9.14728682170543,30.4186046511628,"smooth scrolling enabled"
-"7","main.6",9.18487394957983,29.5210084033613,"support window in bottom-right corner"
-"8","main.7",9.1015625,30.4453125,"pricing bolded"
-"9","main.8",8.96694214876033,30.595041322314,"menu is dropdown"
-"10","main.9",9.21538461538461,28.9769230769231,"website map at the bottom"
-"11","login.0",5,68.5692307692308,"original"
-"12","login.1",4.8,57.3714285714286,"text fields bolded"
-"13","login.2",5.2962962962963,64.5185185185185,"instruction showed"
-"14","login.3",4.83606557377049,64.6885245901639,"text fields magnified"
-"15","login.4",12.2765957446809,79.0165651241612,"name and surname required"
-"16","login.5",4.81818181818182,64.5454545454545,"difficult password required"
-"17","login.6",11.8484848484848,68.1017804361342,"tooltip for textfields visible"
-"18","login.7",11.2894736842105,70.9153486400415,"captcha"
-"19","login.8",5.31147540983607,66.5409836065574,"verification email"
-"20","login.9",11.5454545454545,77.9888453877446,"email required"
-"21","pricing.0",17.0681818181818,21.4986893689328,"original"
-"22","pricing.1",16.8823529411765,17.699072769396,"pricing ascending order"
-"23","pricing.2",9.84905660377358,27.0754716981132,"prices bolded"
-"24","pricing.3",9.95555555555556,26.6,"prices italiazed"
-"25","pricing.4",10.6458333333333,25.7291666666667,"features list is manual"
-"26","pricing.5",9.74468085106383,23.531914893617,"page is long"
-"27","pricing.6",9.97916666666667,24.2916666666667,"a lot of text"
-"28","pricing.7",10.24,23.5,"can pay right away"
-"29","pricing.8",49.0545454545455,11.3695032087291,"consultation button"
-"30","pricing.9",10.3725490196078,25.3725490196078,"captcha"
+,page_name,code,description
+0,main,main.0,original
+1,main,main.1,title on left & login button is red
+2,main,main.2,title on right & login button is red
+3,main,main.3,title on left & login button is orange
+4,main,main.4,title on right & login button is orange
+5,main,main.5,smooth scrolling enabled
+6,main,main.6,support window in bottom-right corner
+7,main,main.7,pricing bolded
+8,main,main.8,menu is dropdown
+9,main,main.9,website map at the bottom
+10,login,login.0,original
+11,login,login.1,text fields bolded
+12,login,login.2,instruction showed
+13,login,login.3,text fields magnified
+14,login,login.4,name and surname required
+15,login,login.5,difficult password required
+16,login,login.6,tooltip for textfields visible
+17,login,login.7,captcha
+18,login,login.8,verification email
+19,login,login.9,email required
+20,pricing,pricing.0,original
+21,pricing,pricing.1,pricing ascending order
+22,pricing,pricing.2,prices bolded
+23,pricing,pricing.3,prices italiazed
+24,pricing,pricing.4,features list is manual
+25,pricing,pricing.5,page is long
+26,pricing,pricing.6,a lot of text
+27,pricing,pricing.7,can pay right away
+28,pricing,pricing.8,consultation button
+29,pricing,pricing.9,captcha

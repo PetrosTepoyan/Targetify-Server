@@ -1,8 +1,7 @@
 class PageVersion:
     
-    def __init__(self, version, code):
-        self.version = version
+    def __init__(self, page_name, code, description):
+        self.page_name = page_name
         self.code = code
+        self.description = description
         
-    def __repr__(self):
-        return f"PageVersion({self.version} | {self.code})"
