@@ -3,8 +3,11 @@ import os
 from tools import DataManipulation
 import pandas as pd
 import json
+from Models.BFFABTestingModel import BFFABTestingModel
 
 app = Flask(__name__, static_url_path='/static/')
+
+testings_file = "static/active_testings.csv"
 
 @app.route("/")
 def home_view():
@@ -65,31 +68,48 @@ def get_pages_info():
 
 @app.route("/create_ab_testing", methods = ["POST"])
 def create_ab_testing():
-    print("FDF", os.listdir())
+
     data = json.loads(request.stream.read(), strict=False)
+
+    title = data["title"]
     groups = data["groups"]
+    page = data["page"]
 
-    with open("static/active_testings.txt", "r") as f:
-        ex = f.readlines()
+    try:
+        testings = pd.read_csv(testings_file, index_col = [0])
+        testings.loc[len(testings)] = [len(testings), title, groups, page]
+        testings.to_csv(testings_file)
+    except:
+        print("Couldn't open")
+        title = data["title"]
+        groups = data["groups"]
+        page = data["page"]
 
-    with open("static/active_testings.txt", "w") as f:
-        if ex == "":
-            f.write(f"{groups}")
-        else:
-            f.write(f"{ex},{groups}")
+        df = pd.DataFrame({"id" : [0], "title" : [title], "groups" : [groups], "page" : [page]})
+        df.set_index("id")
+        df.to_csv(testings_file)
 
     return "success", 200
 
 @app.route("/active_testings")
 def get_active_testings():
-    with open('static/active_testings.txt') as f:
-        lines = f.readlines()
-    if lines:
-        groups = lines[0].split(",")
-        return groups
-    else:
-        return "", 200
+    try:
+        testings = pd.read_csv(testings_file, index_col = [0])
 
+        models = []
+
+        for row in testings.iterrows():
+            props = row[1]
+            title = props["title"]
+            groups = props["groups"]
+            page = props["page"]
+            models.append(BFFABTestingModel(title, groups, page))
+
+        return_json = json.dumps(models, default = lambda x: x.__dict__)
+
+        return return_json, 200
+    except:
+        return [], 200
 
 
 def  _root_directory():
