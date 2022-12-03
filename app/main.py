@@ -4,6 +4,7 @@ from tools import DataManipulation
 import pandas as pd
 import json
 from Models.BFFABTestingModel import BFFABTestingModel
+import simplejson
 
 app = Flask(__name__, static_url_path='/static/')
 
@@ -46,14 +47,17 @@ def get_chart_data():
         groups = None
     # group.split()
 
+    print(data)
+
     chart_data = dm.create_chart(
         page = page_name,
         freq = freq,
         column = column,
         groups = groups)
         
-    return_json = json.dumps(chart_data, default = lambda x: x.__dict__)
+    return_json = __to_json(chart_data)
 
+    print("Returning", chart_data.data_points)
     return return_json, 200
 
 @app.route("/pages_info")
@@ -62,7 +66,7 @@ def get_pages_info():
     dm = DataManipulation()
 
     pageVersions = dm.get_pages_info()
-    return_json = json.dumps(pageVersions, default = lambda x: x.__dict__)
+    return_json = __to_json(pageVersions)
 
     return return_json, 200
 
@@ -105,11 +109,23 @@ def get_active_testings():
             page = props["page"]
             models.append(BFFABTestingModel(title, groups, page))
 
-        return_json = json.dumps(models, default = lambda x: x.__dict__)
+        return_json = __to_json(models)
 
         return return_json, 200
     except:
         return [], 200
+
+@app.route("/delete_testing", methods = ["POST"])
+def delete_testing():
+
+    data = json.loads(request.stream.read(), strict=False)
+    id = int(data["id"])
+
+    testings = pd.read_csv(testings_file, index_col = [0])
+    testings.drop([id], axis=0, inplace=True)
+    testings.to_csv(testings_file)
+
+    return "success", 200
 
 
 def  _root_directory():
@@ -119,6 +135,9 @@ def  _root_directory():
     root_dir = "/" + "/".join(app_dir_list)
     return root_dir
 
+def __to_json(object):
+    return simplejson.dumps(object, ignore_nan=True, default = lambda x: x.__dict__)
+    # return json.dumps(object, default = lambda x: x.__dict__, indent = 4, allow_nan = False)
 
 
 def _subset(df, by_group):

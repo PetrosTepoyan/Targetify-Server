@@ -111,13 +111,30 @@ class DataManipulation:
         else:
             series = df.groupby(pd.Grouper(key = 'date', freq = freq)).mean()[column]
             series.index = pd.DatetimeIndex(series.index)
-            months = [int(i) for i in series.index.strftime('%m')]
-            formatted_index = [calendar.month_abbr[month] for month in months]
-            series.index = formatted_index
+            if freq[1] == "H":
+                freq_format = "%H"
+                series.index = [str(i) for i in series.index.strftime(freq_format)]
 
+            elif freq[1] == "D":
+                freq_format = "%-d"
+                series.index = [str(i) for i in series.index.strftime(freq_format)]
+
+            elif freq[1] == "W":
+                freq_format = "%W"
+                weeks = [int(i) for i in series.index.strftime(freq_format)]
+                formatted_index = [str(week) for week in weeks]
+                series.index = formatted_index
+                series = series[:-1]
+
+            elif freq[1] == "M":
+                freq_format = "%m"
+                months = [int(i) for i in series.index.strftime(freq_format)]
+                formatted_index = [calendar.month_abbr[month] for month in months]
+                series.index = formatted_index
+    
         return series
     
-    def create_data_points(self, df, freq, column, group=None):
+    def create_data_points(self, page, freq, column, group=None):
         """
         A function used to create data points from the given dataframe
         
@@ -132,7 +149,7 @@ class DataManipulation:
         ------------
         A list of DataPoint objects
         """
-        df = df
+        df = pd.read_csv(f"static/pages/{page}")
         freq = freq
         column = column
         group = group
@@ -141,25 +158,27 @@ class DataManipulation:
         
         data_points = []
         
+        series.fillna("")
+
         for ind, element in enumerate(series):
             
             try:
                 x = int(dt.timestamp(series.index[ind]))
             except:
                 x = None
-                
             y = float(series[ind])
             label = str(series.index[ind])
             group = group
             
-            point = DataPoint(
-                x = x,
-                y = y,
-                label = label,
-                group = group
-            )
+            if y:
+                point = DataPoint(
+                    x = x,
+                    y = y,
+                    label = label,
+                    group = group
+                )
             
-            data_points.append(point)
+                data_points.append(point)
 
         return data_points
     
@@ -180,16 +199,26 @@ class DataManipulation:
         A ChartData object
         """
         
-        df = pd.read_csv(f"static/pages/{page}")
         freq = freq
         column = column
 
         if groups:
 
+            page_title = page.split(sep = "_")[1][:-4]
+            pages_info = pd.read_csv("static/pages_info.csv", index_col = [0])
+            filtered_groups = pages_info[pages_info["page_name"] == page_title]
+            descriptions = filtered_groups["description"].reset_index()
+            mapping = {str(group_): descriptions["description"][int(group_)] for group_ in groups}
+
             data_points_list = []
 
             for group in groups:
-                data_points = self.create_data_points(df, freq, column, group)
+
+                data_points = self.create_data_points(page, freq, column, group)
+                
+                for data_point in data_points:
+                    data_point.group = mapping[data_point.group]
+
                 data_points_list = data_points_list + data_points
 
             chart = ChartData(
@@ -202,7 +231,7 @@ class DataManipulation:
             return chart
 
         else:
-            data_points = self.create_data_points(df, freq, column, groups)
+            data_points = self.create_data_points(page, freq, column, groups)
             
             chart = ChartData(
                 page = page,
