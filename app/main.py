@@ -56,7 +56,7 @@ def get_chart_data():
         groups = groups)
         
     return_json = __to_json(chart_data)
-
+    print(return_json)
     return return_json, 200
 
 @app.route("/pages_info")

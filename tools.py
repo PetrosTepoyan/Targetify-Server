@@ -2,6 +2,7 @@ from flask import jsonify, request
 import pandas as pd
 from datetime import datetime as dt
 import calendar
+import copy
 
 # Our models
 from Models.DataPoint import DataPoint
@@ -108,9 +109,11 @@ class DataManipulation:
         isStringType = df.dtypes[column] == "object"
         if isStringType:
             series = df.groupby(pd.Grouper(key = column)).count()["date"]
+            series_original = None
         else:
             series = df.groupby(pd.Grouper(key = 'date', freq = freq)).mean()[column]
             series.index = pd.DatetimeIndex(series.index)
+            series_original = copy.deepcopy(series)
             if freq[1] == "H":
                 freq_format = "%H"
                 series.index = [str(i) for i in series.index.strftime(freq_format)]
@@ -118,21 +121,23 @@ class DataManipulation:
             elif freq[1] == "D":
                 freq_format = "%-d"
                 series.index = [str(i) for i in series.index.strftime(freq_format)]
-
+                series = series[1:]
+                
             elif freq[1] == "W":
                 freq_format = "%W"
                 weeks = [int(i) for i in series.index.strftime(freq_format)]
                 formatted_index = [str(week) for week in weeks]
                 series.index = formatted_index
-                series = series[:-1]
+                series_original = series_original[1:]
+                series = series[1:]
 
             elif freq[1] == "M":
                 freq_format = "%m"
                 months = [int(i) for i in series.index.strftime(freq_format)]
                 formatted_index = [calendar.month_abbr[month] for month in months]
                 series.index = formatted_index
-    
-        return series
+
+        return series, series_original
     
     def create_data_points(self, page, freq, column, group=None):
         """
@@ -154,18 +159,18 @@ class DataManipulation:
         column = column
         group = group
         
-        series = self.get_data_with_frequency(df, freq, column, group)
+        series, series_original = self.get_data_with_frequency(df, freq, column, group)
         
         data_points = []
         
         series.fillna("")
 
         for ind, element in enumerate(series):
-            
+            print(series)
             try:
-                x = int(dt.timestamp(series.index[ind]))
+                x = int(dt.timestamp(series_original.index[ind]))
             except:
-                x = None
+                x = ind
             y = float(series[ind])
             label = str(series.index[ind])
             group = group
