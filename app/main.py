@@ -5,6 +5,8 @@ import pandas as pd
 import json
 from Models.BFFABTestingModel import BFFABTestingModel
 import simplejson
+from abtesting import Multivar_AB_Testing
+from Models.ABTestingPair import ABTestingPair
 
 app = Flask(__name__, static_url_path='/static/')
 
@@ -47,8 +49,6 @@ def get_chart_data():
         groups = None
     # group.split()
 
-    print(data)
-
     chart_data = dm.create_chart(
         page = page_name,
         freq = freq,
@@ -57,7 +57,6 @@ def get_chart_data():
         
     return_json = __to_json(chart_data)
 
-    print("Returning", chart_data.data_points)
     return return_json, 200
 
 @app.route("/pages_info")
@@ -84,7 +83,6 @@ def create_ab_testing():
         testings.loc[len(testings)] = [len(testings), title, groups, page]
         testings.to_csv(testings_file)
     except:
-        print("Couldn't open")
         title = data["title"]
         groups = data["groups"]
         page = data["page"]
@@ -100,16 +98,16 @@ def get_active_testings():
     try:
         testings = pd.read_csv(testings_file, index_col = [0])
 
-        models = []
+        models_ = []
 
         for row in testings.iterrows():
             props = row[1]
             title = props["title"]
             groups = props["groups"]
             page = props["page"]
-            models.append(BFFABTestingModel(title, groups, page))
+            models_.append(BFFABTestingModel(title, groups, page))
 
-        return_json = __to_json(models)
+        return_json = __to_json(models_)
 
         return return_json, 200
     except:
@@ -122,11 +120,44 @@ def delete_testing():
     id = int(data["id"])
 
     testings = pd.read_csv(testings_file, index_col = [0])
-    testings.drop([id], axis=0, inplace=True)
-    testings.to_csv(testings_file)
+    try:
+        testings.drop([id], axis=0, inplace=True)
+        testings.to_csv(testings_file)
+    except:
+        return "success", 200
 
     return "success", 200
 
+@app.route("/get_statistic", methods = ["POST"])
+def get_statistic():
+    data = json.loads(request.stream.read(), strict=False)
+    page = data["page"]
+    groups = data["groups"]
+    df = pd.read_csv(f"static/pages/{page}")
+    page_name = page.split(sep="_")[1][:-5]
+
+    t_df = Multivar_AB_Testing(df, page_name, "group", "clicks")
+
+    t_df = t_df[[e in groups for e in t_df["group1"]]]
+    t_df = t_df[[e in groups for e in t_df["group2"]]]
+    t_df = t_df[["group1.codes", "group2.codes", "meandiff", "p-adj", "reject", "effect_size", "power_size"]]
+    models_ = []
+
+    for row in t_df.iterrows():
+        props = row[1]
+        group1 = props["group1.codes"]
+        group2 = props["group2.codes"]
+        meandiff = props["meandiff"]
+        padj = props["p-adj"]
+        reject = props["reject"]
+        effectSize = props["effect_size"]
+        powerSize = props["power_size"]
+        pair = ABTestingPair(group1, group2, meandiff, padj, reject, effectSize, powerSize)
+        models_.append(pair)
+
+    return_json = __to_json(models_)
+
+    return return_json, 200
 
 def  _root_directory():
     app_dir = os.path.dirname(__file__)
