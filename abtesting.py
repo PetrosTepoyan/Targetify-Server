@@ -52,7 +52,7 @@ def Multivar_AB_Testing(dataframe, page_name, group, target):
                'std.group1', 'std.group2']
         sd_pooled = math.sqrt((df['mean.group1'].std()**2 + df['mean.group2'].std()**2)/2)
         
-        df['effect_size'] = df.meandiff / sd_pooled
+        df['effect_size'] = np.absolute(df.meandiff) / sd_pooled
         df['power_size'] = np.round(norm.cdf(1.96 + df['effect_size'] / 
                              np.sqrt(df['std.group1']**2 / df['size.group1'] + 
                                        df['std.group2']**2 / df['size.group2'])), 5)
