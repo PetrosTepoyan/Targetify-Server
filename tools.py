@@ -166,7 +166,6 @@ class DataManipulation:
         series.fillna("")
 
         for ind, element in enumerate(series):
-            print(series)
             try:
                 x = int(dt.timestamp(series_original.index[ind]))
             except:

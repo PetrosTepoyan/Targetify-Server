@@ -56,7 +56,6 @@ def get_chart_data():
         groups = groups)
         
     return_json = __to_json(chart_data)
-    print(return_json)
     return return_json, 200
 
 @app.route("/pages_info")
@@ -77,7 +76,7 @@ def create_ab_testing():
     title = data["title"]
     groups = data["groups"]
     page = data["page"]
-
+    print(data)
     try:
         testings = pd.read_csv(testings_file, index_col = [0])
         testings.loc[len(testings)] = [len(testings), title, groups, page]
@@ -140,24 +139,29 @@ def get_statistic():
 
     t_df = t_df[[e in groups for e in t_df["group1"]]]
     t_df = t_df[[e in groups for e in t_df["group2"]]]
-    t_df = t_df[["group1.codes", "group2.codes", "meandiff", "p-adj", "reject", "effect_size", "power_size"]]
-    models_ = []
+    print(data)
+    print(t_df)
+    if groups != "":
+        t_df = t_df[["group1.codes", "group2.codes", "meandiff", "p-adj", "reject", "effect_size", "power_size"]]
+        models_ = []
 
-    for row in t_df.iterrows():
-        props = row[1]
-        group1 = props["group1.codes"]
-        group2 = props["group2.codes"]
-        meandiff = props["meandiff"]
-        padj = props["p-adj"]
-        reject = props["reject"]
-        effectSize = props["effect_size"]
-        powerSize = props["power_size"]
-        pair = ABTestingPair(group1, group2, meandiff, padj, reject, effectSize, powerSize)
-        models_.append(pair)
+        for row in t_df.iterrows():
+            props = row[1]
+            group1 = props["group1.codes"]
+            group2 = props["group2.codes"]
+            meandiff = props["meandiff"]
+            padj = props["p-adj"]
+            reject = props["reject"]
+            effectSize = props["effect_size"]
+            powerSize = props["power_size"]
+            pair = ABTestingPair(group1, group2, meandiff, padj, reject, effectSize, powerSize)
+            models_.append(pair)
 
-    return_json = __to_json(models_)
+        return_json = __to_json(models_)
 
-    return return_json, 200
+        return return_json, 200
+    else:
+        return {}, 400
 
 def  _root_directory():
     app_dir = os.path.dirname(__file__)
